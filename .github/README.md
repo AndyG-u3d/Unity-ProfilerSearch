@@ -15,7 +15,7 @@ Install via the Unity Package Manager's [git URL](https://docs.unity3d.com/2021.
 - Open the tool via the `Window -> Profiler Search` menu.
 
 
-- In `Inject into Profiler Window` mode, the search UI will appear at the bottom of the profiler window.
+- In `Inject into Profiler Window` mode, the search UI will appear at the bottom of the profiler window. (Note: Not available in 2021.1 or earlier)
 - In `Standalone Window` mode, the search UI will appear in its own window. This mode requires slightly more UI real estate than injection mode, but can be positioned however you choose.
 
 ## Known Issues
