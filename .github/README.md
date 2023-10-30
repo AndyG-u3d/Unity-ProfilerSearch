@@ -4,9 +4,9 @@ This package adds search functionality to the Unity Profiler. It supports search
 ![Screenshot](Images/Screenshot_Injected.png)
 
 ## Disclaimer
-This package is experimental. It has not been fully tested on versions prior to Unity 2021.3.14 - 2022.3.5, and does not yet support 2019.x at all.
+This package is experimental. It has only been lightly tested on versions of Unity between 2021.1.0 - 2022.3.5, and does not yet support 2020 or 2019 at all.
 
-Bug reports, feature requests, etc are welcome.
+Bug reports, feature requests, etc. are welcome.
 
 ## Installation
 Install via the Unity Package Manager's [git URL](https://docs.unity3d.com/2021.1/Documentation/Manual/upm-ui-giturl.html) option
