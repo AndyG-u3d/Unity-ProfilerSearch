@@ -4,7 +4,7 @@
   "description": "Adds additional search functionality to the Unity Profiler",
   "displayName": "Unity Profiler Search",
   "author": "Unity Consulting",
-  "unity": "2020.1",
+  "unity": "2021.1",
   "unityRelease": "0f1",
   "dependencies": {
     "com.unity.modules.uielements": "1.0.0"
