@@ -1,6 +1,8 @@
 # Unity-ProfilerSearch
 This package adds search functionality to the Unity Profiler. It supports searching both forwards and backwards through captures.
 
+![Screenshot](Images/Screenshot_Injected.png)
+
 ## Disclaimer
 This package is experimental. It has not been fully tested on versions prior to Unity 2021.3.14 - 2022.3.5, and does not yet support 2019.x at all.
 
