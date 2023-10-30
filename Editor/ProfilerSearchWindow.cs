@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Unity.Profiling;
+#if UNITY_2021_2_OR_NEWER
 using Unity.Profiling.Editor;
+#endif
 using Unity.Profiling.LowLevel;
 using UnityEditor;
 using UnityEditor.Profiling;
@@ -15,8 +17,15 @@ using UnityEngine.UIElements;
 
 public class ProfilerSearchUtil
 {
+#if UNITY_2021_2_OR_NEWER
+    private const string c_profilerWindowCPUModuleIdentifier = ProfilerWindow.cpuModuleIdentifier;
+#else
+    private const string c_profilerWindowCPUModuleIdentifier = ProfilerWindow.cpuModuleName;
+#endif
+
     private const string c_searchContainerName = "profiler-search-extension";
 
+#if UNITY_2021_2_OR_NEWER
     // inserts the search UI into the profiler window container..
     [MenuItem("Window/Profiler Search/Inject into Profiler Window")]
     public static void ShowWindow()
@@ -46,6 +55,7 @@ public class ProfilerSearchUtil
     }
 
     private static ProfilerSearchUtil s_instance;
+#endif
 
     private TextField m_searchText;
     private Button m_searchBackButton;
@@ -53,6 +63,18 @@ public class ProfilerSearchUtil
     private Toggle m_caseSensitiveToggle;
     private Toggle m_matchFullWordToggle;
     private bool m_ignoreSelectionChange;
+
+    public void SubscribeToProfilerCallbacks()
+    {
+        // register for profiler selection changed callbacks.
+        if (EditorWindow.HasOpenInstances<ProfilerWindow>())
+        {
+            ProfilerWindow profilerWindow = EditorWindow.GetWindow<ProfilerWindow>();
+
+            var sampleSelectionController = profilerWindow.GetFrameTimeViewSampleSelectionController(c_profilerWindowCPUModuleIdentifier);
+            sampleSelectionController.selectionChanged += OnProfilerSelectionChanged;
+        }
+    }
 
     public void CreateProfilerSearchGUI(VisualElement root)
     {
@@ -103,14 +125,7 @@ public class ProfilerSearchUtil
             root.Add(m_searchText);
         }
 
-        // register for profiler selection changed callbacks.
-        if (EditorWindow.HasOpenInstances<ProfilerWindow>())
-        {
-            ProfilerWindow profilerWindow = EditorWindow.GetWindow<ProfilerWindow>();
-
-            var sampleSelectionController = profilerWindow.GetFrameTimeViewSampleSelectionController(ProfilerWindow.cpuModuleIdentifier);
-            sampleSelectionController.selectionChanged += OnProfilerSelectionChanged;
-        }
+        SubscribeToProfilerCallbacks();
     }
 
     void OnProfilerSelectionChanged(IProfilerFrameTimeViewSampleSelectionController controller, ProfilerTimeSampleSelection selection)
@@ -162,11 +177,17 @@ public class ProfilerSearchUtil
         if (EditorWindow.HasOpenInstances<ProfilerWindow>())
         {
             ProfilerWindow profilerWindow = EditorWindow.GetWindow<ProfilerWindow>();
-            if (profilerWindow.selectedModuleIdentifier == ProfilerWindow.cpuModuleIdentifier)
+
+#if UNITY_2021_2_OR_NEWER || UNITY_2022_OR_NEWER
+            if (profilerWindow.selectedModuleIdentifier == c_profilerWindowCPUModuleIdentifier)
+#else
+            if (profilerWindow.selectedModuleName == c_profilerWindowCPUModuleIdentifier)
+#endif
             {
                 long startFrameIndex = profilerWindow.selectedFrameIndex;
 
-                var sampleSelectionController = profilerWindow.GetFrameTimeViewSampleSelectionController(ProfilerWindow.cpuModuleIdentifier);
+                var sampleSelectionController = profilerWindow.GetFrameTimeViewSampleSelectionController(c_profilerWindowCPUModuleIdentifier);
+
                 var threadIndex = sampleSelectionController.focusedThreadIndex >= 0 ? sampleSelectionController.focusedThreadIndex : 0;
                 var selection = sampleSelectionController.selection;
 
@@ -233,7 +254,12 @@ public class ProfilerSearchUtil
                                 Profiler.BeginSample("Sample");
 
                                 if (!string.IsNullOrEmpty(sampleName) &&
-                                    (matchFullString ? sampleName.Equals(text, caseMatch) : sampleName.Contains(text, caseMatch)))
+                                    (matchFullString ? sampleName.Equals(text, caseMatch)
+#if UNITY_2021_2_OR_NEWER
+                                        : sampleName.Contains(text, caseMatch)))
+#else
+                                        : sampleName.Contains(text)))
+#endif
                                 {
                                     ulong sampleTime = frameData.GetSampleStartTimeNs(sampleIdx);
 
@@ -316,6 +342,12 @@ public class ProfilerSearchWindow : EditorWindow
 
         ProfilerSearchWindow window = GetWindow<ProfilerSearchWindow>();
         window.titleContent = new GUIContent("Profiler Search");
+
+        // ensure callbacks are set up
+        if (window.m_inspector != null)
+        {
+            window.m_inspector.SubscribeToProfilerCallbacks();
+        }
     }
 
     private ProfilerSearchUtil m_inspector;
