@@ -20,6 +20,6 @@ Install via the Unity Package Manager's [git URL](https://docs.unity3d.com/2021.
 
 ## Known Issues
 
-- Will not work in Unity versions prior to 2021.1. Support for 2019.4 & 2020 is on the todo list.
+- Will not work in Unity versions prior to 2021.1. Support for 2019.4 & 2020 is no longer planned.
 - Searching through large captures can take a couple of seconds in the worst cases.
 - Search text does not persist following a script reload.
